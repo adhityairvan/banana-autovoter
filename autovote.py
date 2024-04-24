@@ -13,26 +13,26 @@ def loadConfigAndSettings():
         config = json.load(configRaw)
         usernames = config['usernames']
     chrome_options = webdriver.ChromeOptions()
-    chrome_options.add_experimental_option("detach", True)
+    chrome_options.add_argument('headless')
     return usernames,chrome_options
 
 def login(driver, username):
-    usernameInput = driver.find_element(By.NAME, "username")
+    usernameInput = driver.find_element(By.NAME, 'username')
     usernameInput.clear()
     usernameInput.send_keys(username)
     usernameInput.send_keys(Keys.RETURN)
 
-    WebDriverWait(driver, 15).until(EC.visibility_of_element_located((By.LINK_TEXT, "Logout")))
+    WebDriverWait(driver, 15).until(EC.visibility_of_element_located((By.LINK_TEXT, 'Logout')))
 
 def logout(driver):
-    logoutButton = driver.find_element(By.LINK_TEXT, "Logout")
+    logoutButton = driver.find_element(By.LINK_TEXT, 'Logout')
     logoutButton.click()
-    WebDriverWait(driver, 15).until(EC.visibility_of_element_located((By.LINK_TEXT, "Login")))
+    WebDriverWait(driver, 15).until(EC.visibility_of_element_located((By.LINK_TEXT, 'Login')))
 
 def tryVoteAllOption(driver):
     windowHandle = driver.current_window_handle;
-    driver.get(RFBANANA_CPANEL + "/index.php?do=user_vote")
-    voteButtons = driver.find_elements(By.NAME, "vote_id")
+    driver.get(RFBANANA_CPANEL + '/index.php?do=user_vote')
+    voteButtons = driver.find_elements(By.NAME, 'vote_id')
     for button in voteButtons:
         if(not button.is_enabled()):
             continue
@@ -49,5 +49,5 @@ with webdriver.Chrome(options= chrome_options) as driver:
         login(driver, username)
         tryVoteAllOption(driver)
         logout(driver)
-        print("RF Banana voting for account: " + username + " is complete")
-    print("Finish voting for all account inputted")
+        print('RF Banana voting for account: ' + username + ' is complete')
+    print('Finish voting for all account inputted. Enjoy -NightKnight')
