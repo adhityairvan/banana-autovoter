@@ -4,6 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.chrome.options import Options;
 import json
 
 RFBANANA_CPANEL = "https://cp.rfbanana.ru"
@@ -12,9 +13,11 @@ def loadConfigAndSettings():
     with open('config.json') as configRaw:
         config = json.load(configRaw)
         usernames = config['usernames']
+        cpanelUrl = config.get('cpanel_host', RFBANANA_CPANEL)
     chrome_options = webdriver.ChromeOptions()
-    chrome_options.add_argument('headless')
-    return usernames,chrome_options
+    chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--log-level=3')
+    return cpanelUrl, usernames, chrome_options
 
 def login(driver, username):
     usernameInput = driver.find_element(By.NAME, 'username')
@@ -37,15 +40,16 @@ def tryVoteAllOption(driver):
         if(not button.is_enabled()):
             continue
         button.click()
+        print("Voted. Cash point added")
         driver.switch_to.window(windowHandle)
 
 usernames = []
-usernames, chrome_options = loadConfigAndSettings()
+cpanelHost, usernames, chrome_options = loadConfigAndSettings()
 
 with webdriver.Chrome(options= chrome_options) as driver:
     print(usernames)
     for username in usernames:
-        driver.get(RFBANANA_CPANEL)
+        driver.get(cpanelHost)
         login(driver, username)
         tryVoteAllOption(driver)
         logout(driver)
