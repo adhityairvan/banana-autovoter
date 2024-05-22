@@ -4,7 +4,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.chrome.options import Options;
+from selenium.common.exceptions import NoSuchElementException
+
 import json
 
 RFBANANA_CPANEL = "https://cp.rfbanana.ru"
@@ -49,9 +50,14 @@ cpanelHost, usernames, chrome_options = loadConfigAndSettings()
 with webdriver.Chrome(options= chrome_options) as driver:
     print(usernames)
     for username in usernames:
-        driver.get(cpanelHost)
-        login(driver, username)
-        tryVoteAllOption(driver)
-        logout(driver)
-        print('RF Banana voting for account: ' + username + ' is complete')
+        try:
+            driver.delete_all_cookies()
+            driver.get(cpanelHost)
+            login(driver, username)
+            tryVoteAllOption(driver)
+            logout(driver)
+            print('RF Banana voting for account: ' + username + ' is complete')
+        except NoSuchElementException as ex:
+            print('Error Auto voting for username: ' + username)
+            print('Error happen when searching for things to click. Probably from slow connection to website. Please re run if needed')
     print('Finish voting for all account inputted. Enjoy -NightKnight')
