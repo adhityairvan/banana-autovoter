@@ -1,3 +1,5 @@
 {
-    "usernames": ["adhityairvan", "adhityairvan2", "adhityairvan3"]
+    "usernames": ["adhityairvan", "adhityairvan2", "adhityairvan3", "Wuf", "vercade2"],
+    "timeout_limit": 10,
+    "debug_mode": true
 }

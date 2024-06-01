@@ -5,3 +5,5 @@ lib
 build
 bin
 .DS_Store
+pytho3.8Env/
+Scripts/
