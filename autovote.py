@@ -12,13 +12,24 @@ import os
 
 RFBANANA_CPANEL = "https://cp.rfbanana.ru"
 
+class Account:
+    username: str
+    password: str
+    def __init__(self, username, password) -> None:
+        self.username = username
+        self.password = password
+        pass
+    def __str__(self) -> str:
+        return self.username
+
 class Config:
-    usernames: list = []
+    accounts: list[Account] = []
     cpanelUrl: str = RFBANANA_CPANEL
     timeoutLimit: int = 15
     debugMode: bool = False
     def __init__(self, config: dict) -> None:
-        self.usernames = config['usernames']
+        for jsonAccount in config.get('accounts'):
+            self.accounts.append(Account(jsonAccount.get('username'), jsonAccount.get('password')))
         self.cpanelUrl = config.get('cpanel_host', RFBANANA_CPANEL)
         self.timeoutLimit = config.get('timeout_limit')
         self.debugMode = config.get('debug_mode', False)
@@ -37,10 +48,15 @@ class AutoVoteApp:
         chrome_options.add_argument('--log-level=3')
         self.driver = webdriver.Chrome(options= chrome_options)
         pass
-    def login(self, username):
+    def login(self, account: Account):
         usernameInput = self.driver.find_element(By.NAME, 'username')
         usernameInput.clear()
-        usernameInput.send_keys(username)
+        usernameInput.send_keys(account.username)
+
+        passwordInput = self.driver.find_element(By.NAME, 'password')
+        passwordInput.clear()
+        passwordInput.send_keys(account.password)
+
         usernameInput.send_keys(Keys.RETURN)
 
         try :
@@ -64,19 +80,21 @@ class AutoVoteApp:
             print("Voted. Cash point added")
             self.driver.switch_to.window(windowHandle)
     def start(self):
-        print(self.appConfig.usernames)
-        for username in self.appConfig.usernames:
+        for account in self.appConfig.accounts:
+            print(account.__str__(), end=" | ")
+        print()
+        for account in self.appConfig.accounts:
             try:
                 self.driver.delete_all_cookies()
                 self.driver.get(self.appConfig.cpanelUrl)
-                self.login(username)
+                self.login(account)
                 self.tryVoteAllOption()
                 self.logout()
-                print('RF Banana voting for account: ' + username + ' is complete')
+                print('RF Banana voting for account: ' + account.username + ' is complete')
             except ValueError:
-                print('Failed to login' + username + ' or account not exists')
+                print('Failed to login' + account.username + ' or account not exists')
             except (NoSuchElementException , TimeoutException) as ex:
-                print('Error Auto voting for username: ' + username)
+                print('Error Auto voting for username: ' + account.username)
                 print('Error happen when searching for things to click. Probably from slow connection to website. Please re run if needed')
         print('Finish voting for all account inputted. Enjoy -NightKnight')
         if self.appConfig.debugMode:
