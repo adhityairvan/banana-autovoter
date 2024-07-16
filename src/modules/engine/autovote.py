@@ -1,53 +1,32 @@
+from src.modules.configuration.config import Config
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException,TimeoutException
+from selenium.webdriver.remote.webdriver import WebDriver
 
-import json
+from queue import Queue
+from src.modules.dataclass.account import Account
+from src.modules.dataclass.votingProcessMessage import VotingProcessMessage
 import os
-
-RFBANANA_CPANEL = "https://cp.rfbanana.ru"
-
-class Account:
-    username: str
-    password: str
-    def __init__(self, username, password) -> None:
-        self.username = username
-        self.password = password
-        pass
-    def __str__(self) -> str:
-        return self.username
-
-class Config:
-    accounts: list[Account] = []
-    cpanelUrl: str = RFBANANA_CPANEL
-    timeoutLimit: int = 15
-    debugMode: bool = False
-    def __init__(self, config: dict) -> None:
-        for jsonAccount in config.get('accounts'):
-            self.accounts.append(Account(jsonAccount.get('username'), jsonAccount.get('password')))
-        self.cpanelUrl = config.get('cpanel_host', RFBANANA_CPANEL)
-        self.timeoutLimit = config.get('timeout_limit')
-        self.debugMode = config.get('debug_mode', False)
-        pass
+from src.modules.configuration.config import RFBANANA_CPANEL
 
 class AutoVoteApp:
     appConfig: Config
     driver: WebDriver
-    def __init__(self) -> None:
-        with open('config.json') as configRaw:
-            config = json.load(configRaw)
-            self.appConfig = Config(config)
+    queue: Queue
+    def __init__(self, queue: Queue) -> None:
+        self.appConfig = Config()
         chrome_options = webdriver.ChromeOptions()
         if self.appConfig.debugMode is False:
             chrome_options.add_argument('--headless')
         chrome_options.add_argument('--log-level=3')
         self.driver = webdriver.Chrome(options= chrome_options)
+        self.queue = queue
         pass
+
     def login(self, account: Account):
         usernameInput = self.driver.find_element(By.NAME, 'username')
         usernameInput.clear()
@@ -80,9 +59,14 @@ class AutoVoteApp:
             print("Voted. Cash point added")
             self.driver.switch_to.window(windowHandle)
     def start(self):
+        if(self.appConfig.accounts.__len__() == 0):
+            print('No account inputted. Please input account first')
+            self.queue.put(VotingProcessMessage("voting", 1, 1, list()))
+            return
         for account in self.appConfig.accounts:
             print(account.__str__(), end=" | ")
         print()
+        numProcessed: int = 0
         for account in self.appConfig.accounts:
             try:
                 self.driver.delete_all_cookies()
@@ -96,10 +80,8 @@ class AutoVoteApp:
             except (NoSuchElementException , TimeoutException) as ex:
                 print('Error Auto voting for username: ' + account.username)
                 print('Error happen when searching for things to click. Probably from slow connection to website. Please re run if needed')
+            numProcessed += 1
+            self.queue.put(VotingProcessMessage("voting", self.appConfig.accounts.__len__(), numProcessed, list()))
         print('Finish voting for all account inputted. Enjoy -NightKnight')
         if self.appConfig.debugMode:
             os.system("pause")
-
-if __name__ == "__main__" :
-    autoVoteApp: AutoVoteApp = AutoVoteApp()
-    autoVoteApp.start()
