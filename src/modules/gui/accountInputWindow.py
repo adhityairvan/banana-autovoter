@@ -1,11 +1,12 @@
 import tkinter as tk
 from tkinter import Button, Entry, Label, Listbox, Toplevel, Misc
+from typing import Tuple
 
 class AccountInputWindow(Toplevel):
     saveButton: Button
     usernameInput: Entry
     passwordInput: Entry
-    input: tuple[str, str]
+    input: Tuple[str, str]
     def __init__(self, master: Misc) -> None:
         super().__init__(master=master, width=250, height=100, padx=2, pady=5)
         self.title("Input New Account")

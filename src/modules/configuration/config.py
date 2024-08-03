@@ -1,15 +1,23 @@
+from typing import List
+
+from networkx import null_graph
 from src.modules.dataclass.account import Account
 from src.modules.configuration import CONFIG_FILE, RFBANANA_CPANEL
 import json
 import jsons
 
 class Config:
-    accounts: list[Account] = []
+    accounts: List[Account] = []
     cpanelUrl: str = RFBANANA_CPANEL
     timeoutLimit: int = 15
     debugMode: bool = False
     def __init__(self) -> None:
-        with open(CONFIG_FILE, encoding="UTF") as configRaw:
+        with open(CONFIG_FILE, encoding="UTF", mode="a+") as configRaw:
+            configRaw.seek(0)
+            if(configRaw.read() == ""):
+                stringDumps = jsons.dumps(obj=self, key_transformer=jsons.KEY_TRANSFORMER_SNAKECASE)
+                configRaw.write(stringDumps)
+            configRaw.seek(0)
             config = json.load(configRaw)
             for jsonAccount in config.get('accounts'):
                 self.accounts.append(Account(jsonAccount.get('username'), jsonAccount.get('password')))
@@ -25,6 +33,6 @@ class Config:
                 self.accounts.remove(account)
                 return
     def saveChangesToJson(self):
-        with open(CONFIG_FILE, mode="w") as configRaw:
+        with open(CONFIG_FILE, mode="w+") as configRaw:
             stringDumps = jsons.dumps(obj=self, key_transformer=jsons.KEY_TRANSFORMER_SNAKECASE)
             configRaw.write(stringDumps)

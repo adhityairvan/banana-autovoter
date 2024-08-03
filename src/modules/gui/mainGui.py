@@ -1,3 +1,4 @@
+from math import fabs
 import sys
 import threading
 import queue
@@ -20,11 +21,13 @@ class AutovoteGui(Tk):
     def __init__(self) -> None:
         super().__init__("Autovoter v1.1.0", None, "Autovote", useTk=True, sync= False)
         self.title('RF Banana Autovoter v1.1.0')
-        self.geometry("400x250")
+        self.geometry("385x270")
+        self.resizable(False, False)
+        self.configure(padx=10, pady=5)
         self.drawGui()
 
-        sys.stdout.write = self.outputRedirector
-        sys.stderr.write = self.outputRedirector
+        # sys.stdout.write = self.outputRedirector
+        # sys.stderr.write = self.outputRedirector
 
         self.text_area: scrolledtext.ScrolledText
         self.processingQueue: queue.Queue = queue.Queue()
@@ -33,7 +36,7 @@ class AutovoteGui(Tk):
 
     def drawGui(self):
         self.startButton = Button(self, text='Start Voting!', command=self.startButtonAction)
-        self.startButton.grid(row=1, column=0, sticky="ew")
+        self.startButton.grid(row=1, sticky="ew")
 
         firstFrame = Frame(self)
         firstFrame.grid(row=0, sticky="nsew")
@@ -47,7 +50,7 @@ class AutovoteGui(Tk):
         self.text_area = scrolledtext.ScrolledText(self,  
                                         wrap = WORD,  
                                         height = 10,
-                                        width = 20,
+                                        width = 10,
                                         font = ("Times New Roman", 
                                                 15)) 
         self.text_area.grid(row=2, sticky="ew")

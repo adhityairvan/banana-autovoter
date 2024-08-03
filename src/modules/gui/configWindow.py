@@ -1,5 +1,7 @@
 import tkinter
 from tkinter import Toplevel, Listbox, Button, EXTENDED, END, DISABLED, Misc, NORMAL
+from turtle import width
+from typing import Tuple
 from src.modules.configuration.config import Config
 from src.modules.gui.accountInputWindow import AccountInputWindow
 
@@ -11,10 +13,10 @@ class ConfigWindow(Toplevel):
     deleteButton: Button
     saveButton: Button
     accountInputWindow: Toplevel
-    newUserInput: tuple[str, str]
+    newUserInput: Tuple[str, str]
     needSave: bool
     def __init__(self, master: Misc, config: Config) -> None:
-        super().__init__(master=master, width=250, height=300, padx=2, pady=5)
+        super().__init__(master=master, width=400, height=300, padx=2, pady=5)
         self.title("Configuration")
         self.config = config
         self.needSave = False
@@ -24,7 +26,7 @@ class ConfigWindow(Toplevel):
         self.checkNotSaved()
 
     def drawGui(self):
-        self.userListBox = Listbox(self, selectmode=EXTENDED)
+        self.userListBox = Listbox(self, selectmode=EXTENDED, width=30)
         for account in self.config.accounts:
             self.userListBox.insert(END, account.username)
         self.addButton = Button(self, text="Add Account", command=self.addAccountButtonAction)
@@ -32,8 +34,8 @@ class ConfigWindow(Toplevel):
         self.saveButton = Button(self, text="Save", state=DISABLED, command=self.saveButtonAction)
         self.debugModeCheckbox = tkinter.Checkbutton(self, text="Debug Mode", variable=self.debugModeVar, command=self.debugModeCheckboxAction)
         self.userListBox.grid(row=0, columnspan=2)
-        self.addButton.grid(row=1, column=0)
-        self.deleteButton.grid(row=1, column=1)
+        self.addButton.grid(row=1, column=0, sticky="news")
+        self.deleteButton.grid(row=1, column=1, sticky="news")
         self.saveButton.grid(row=3, columnspan=2, sticky="news")
         self.debugModeCheckbox.grid(row=2, columnspan=2, sticky="w")
 
