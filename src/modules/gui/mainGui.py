@@ -21,6 +21,7 @@ class AutovoteGui(Tk):
     def __init__(self) -> None:
         super().__init__("Autovoter v1.1.0", None, "Autovote", useTk=True, sync= False)
         self.title('RF Banana Autovoter v1.1.0')
+        self.iconbitmap("../resources/banana-voter.ico")
         self.geometry("385x270")
         self.resizable(False, False)
         self.configure(padx=10, pady=5)
