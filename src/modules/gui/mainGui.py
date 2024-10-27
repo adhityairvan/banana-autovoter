@@ -22,13 +22,11 @@ class AutovoteGui(Tk):
     def __init__(self) -> None:
         super().__init__("Autovoter v1.1.0", None, "Autovote", useTk=True, sync= False)
         self.title('RF Banana Autovoter v1.1.0')
-        self.iconbitmap("./banana-voter.ico")
+        self.iconbitmap(default="./_internal/banana-voter.ico")
         self.geometry("385x270")
         self.resizable(False, False)
         self.configure(padx=10, pady=5)
         self.drawGui()
-
-
         self.text_area: scrolledtext.ScrolledText
         self.processingQueue: queue.Queue = queue.Queue()
         self.autoVoteApp: AutoVoteApp = AutoVoteApp(self.processingQueue)
@@ -108,4 +106,9 @@ class AutovoteGui(Tk):
         self.after(200, self.readQueue)
 
     def configureButtonAction(self):
-        self.configWindow = ConfigWindow(self, self.autoVoteApp.appConfig)
+        root_x = self.winfo_rootx()
+        root_y = self.winfo_rooty()
+        if not hasattr(self, "configWindow") or not self.configWindow.winfo_exists() :
+            self.configWindow = ConfigWindow(self, self.autoVoteApp.appConfig, root_x, root_y)
+        else:
+            self.configWindow.focus_set()

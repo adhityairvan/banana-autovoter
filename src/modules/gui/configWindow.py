@@ -15,9 +15,11 @@ class ConfigWindow(Toplevel):
     accountInputWindow: Toplevel
     newUserInput: Tuple[str, str]
     needSave: bool
-    def __init__(self, master: Misc, config: Config) -> None:
-        super().__init__(master=master, width=400, height=300, padx=2, pady=5)
+    def __init__(self, master: Misc, config: Config, xPos: int, yPos: int) -> None:
+        super().__init__(master=master, padx=2, pady=5)
         self.title("Configuration")
+        self.geometry(f'200x250+{xPos}+{yPos}')
+        # self.iconbitmap(default="./banana-voter.ico")
         self.config = config
         self.needSave = False
         self.debugModeVar = tkinter.BooleanVar(master=self, value=self.config.debugMode)
