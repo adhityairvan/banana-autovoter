@@ -1,5 +1,3 @@
-from math import fabs
-import sys
 import threading
 import queue
 from tkinter import DISABLED, Tk, scrolledtext, Button, Frame
@@ -17,7 +15,7 @@ class AutovoteGui(Tk):
     startButton: Button
     configureButton: Button
     progress: Progressbar
-    text_area: scrolledtext.ScrolledText
+    textArea: scrolledtext.ScrolledText
     configWindow: ConfigWindow
     def __init__(self) -> None:
         super().__init__("Autovoter v1.1.0", None, "Autovote", useTk=True, sync= False)
@@ -27,7 +25,7 @@ class AutovoteGui(Tk):
         self.resizable(False, False)
         self.configure(padx=10, pady=5)
         self.drawGui()
-        self.text_area: scrolledtext.ScrolledText
+        self.textArea: scrolledtext.ScrolledText
         self.processingQueue: queue.Queue = queue.Queue()
         self.autoVoteApp: AutoVoteApp = AutoVoteApp(self.processingQueue)
 
@@ -38,27 +36,32 @@ class AutovoteGui(Tk):
 
         firstFrame = Frame(self)
         firstFrame.grid(row=0, sticky="nsew")
-        self.configureButton = Button(firstFrame, text='Configure', command=self.configureButtonAction)
+        self.configureButton = Button(firstFrame, text='Configure', 
+                                      command=self.configureButtonAction)
         self.configureButton.grid(row=0, column=1)
 
         self.progressVal = tkinter.DoubleVar()
-        progressBar = Progressbar(firstFrame, orient="horizontal", variable= self.progressVal, length=300, mode="determinate", maximum=100)
+        progressBar = Progressbar(firstFrame, 
+                                  orient="horizontal", 
+                                  variable= self.progressVal, 
+                                  length=300, mode="determinate", 
+                                  maximum=100)
         progressBar.grid(row=0)
 
-        self.text_area = scrolledtext.ScrolledText(self,  
+        self.textArea = scrolledtext.ScrolledText(self,  
                                         wrap = WORD,  
                                         height = 10,
                                         width = 10,
                                         font = ("Times New Roman", 
                                                 15)) 
-        self.text_area.grid(row=2, sticky="ew")
-        self.text_area.configure(state ='disabled')
+        self.textArea.grid(row=2, sticky="ew")
+        self.textArea.configure(state ='disabled')
 
     def outputRedirector(self,inputStr) -> int:
-        self.text_area.configure(state=NORMAL)
-        self.text_area.insert(INSERT, inputStr)
-        self.text_area.see(END)
-        self.text_area.configure(state=DISABLED)
+        self.textArea.configure(state=NORMAL)
+        self.textArea.insert(INSERT, inputStr)
+        self.textArea.see(END)
+        self.textArea.configure(state=DISABLED)
         return 1
     def readQueue(self):
         try:
@@ -71,32 +74,28 @@ class AutovoteGui(Tk):
             self.after(200, self.readQueue)
         except queue.Empty:
             self.after(200, self.readQueue)
-            pass
-        pass
 
     def votingMessageCallback(self, message: VotingProcessMessage):
-        value = message.numProcessed.__float__() / message.totalAccount.__float__() * 100
+        value = float(message.numProcessed) / float(message.totalAccount) * 100
         self.progressVal.set(value)
         if(message.totalAccount == message.numProcessed):
             self.startButton.config(state=NORMAL)
             self.startButton.config(text='Start Voting!')
             self.progressVal.set(100)
-        pass
 
     def textMessageCallback(self, message: TextMessage):
         value = message.textMessage
-        self.text_area.configure(state=NORMAL)
-        self.text_area.insert(INSERT, value)
-        self.text_area.insert(END,'\n')
-        self.text_area.see(END)
-        self.text_area.configure(state=DISABLED)
-        pass
+        self.textArea.configure(state=NORMAL)
+        self.textArea.insert(INSERT, value)
+        self.textArea.insert(END,'\n')
+        self.textArea.see(END)
+        self.textArea.configure(state=DISABLED)
 
     def startButtonAction(self):
-        self.text_area.configure(state=NORMAL)
-        self.text_area.delete('1.0',END)
-        self.text_area.see(END)
-        self.text_area.configure(state=DISABLED)
+        self.textArea.configure(state=NORMAL)
+        self.textArea.delete('1.0',END)
+        self.textArea.see(END)
+        self.textArea.configure(state=DISABLED)
 
         self.progressVal.set(0)
         t1 = threading.Thread(target=self.autoVoteApp.start)
@@ -106,9 +105,9 @@ class AutovoteGui(Tk):
         self.after(200, self.readQueue)
 
     def configureButtonAction(self):
-        root_x = self.winfo_rootx()
-        root_y = self.winfo_rooty()
+        rootX = self.winfo_rootx()
+        rootY = self.winfo_rooty()
         if not hasattr(self, "configWindow") or not self.configWindow.winfo_exists() :
-            self.configWindow = ConfigWindow(self, self.autoVoteApp.appConfig, root_x, root_y)
+            self.configWindow = ConfigWindow(self, self.autoVoteApp.appConfig, rootX, rootY)
         else:
             self.configWindow.focus_set()

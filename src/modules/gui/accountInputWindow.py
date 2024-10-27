@@ -1,5 +1,4 @@
-import tkinter as tk
-from tkinter import Button, Entry, Label, Listbox, Toplevel, Misc
+from tkinter import Button, Entry, Label, Toplevel, Misc
 from typing import Tuple
 
 class AccountInputWindow(Toplevel):

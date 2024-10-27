@@ -1,4 +1,6 @@
-from src.modules.configuration.config import Config
+import os
+from queue import Queue
+
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
@@ -7,11 +9,10 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException,TimeoutException
 from selenium.webdriver.remote.webdriver import WebDriver
 
-from queue import Queue
 from src.modules.dataclass.account import Account
 from src.modules.dataclass.textMessage import TextMessage
 from src.modules.dataclass.votingProcessMessage import VotingProcessMessage
-import os
+from src.modules.configuration.config import Config
 from src.modules.configuration.config import RFBANANA_CPANEL
 
 class AutoVoteApp:
@@ -20,13 +21,12 @@ class AutoVoteApp:
     queue: Queue
     def __init__(self, queue: Queue) -> None:
         self.appConfig = Config()
-        chrome_options = webdriver.ChromeOptions()
+        chromeOptions = webdriver.ChromeOptions()
         if self.appConfig.debugMode is False:
-            chrome_options.add_argument('--headless')
-        chrome_options.add_argument('--log-level=3')
-        self.driver = webdriver.Chrome(options= chrome_options)
+            chromeOptions.add_argument('--headless')
+        chromeOptions.add_argument('--log-level=3')
+        self.driver = webdriver.Chrome(options= chromeOptions)
         self.queue = queue
-        pass
 
     def login(self, account: Account):
         usernameInput = self.driver.find_element(By.NAME, 'username')
@@ -41,8 +41,8 @@ class AutoVoteApp:
 
         try :
             WebDriverWait(self.driver, self.appConfig.timeoutLimit).until(EC.visibility_of_element_located((By.LINK_TEXT, 'Logout')))
-        except TimeoutException:
-            raise ValueError
+        except TimeoutException as exc:
+            raise ValueError from exc
 
     def logout(self):
         logoutButton = self.driver.find_element(By.LINK_TEXT, 'Logout')
@@ -60,7 +60,7 @@ class AutoVoteApp:
             self.print("Voted. Cash point added")
             self.driver.switch_to.window(windowHandle)
     def start(self):
-        if(self.appConfig.accounts.__len__() == 0):
+        if(len(self.appConfig.accounts) == 0):
             self.print('No account inputted. Please input account first')
             self.queue.put(VotingProcessMessage("voting", 1, 1, list()))
             return
@@ -75,7 +75,7 @@ class AutoVoteApp:
                 self.print('RF Banana voting for account: ' + account.username + ' is complete')
             except ValueError:
                 self.print('Failed to login' + account.username + ' or account not exists')
-            except (NoSuchElementException , TimeoutException) as ex:
+            except (NoSuchElementException , TimeoutException):
                 self.print('Error Auto voting for username: ' + account.username)
                 self.print('Error happen when searching for things to click. Probably from slow connection to website. Please re run if needed')
             numProcessed += 1

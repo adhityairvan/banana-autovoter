@@ -1,6 +1,5 @@
 import tkinter
 from tkinter import Toplevel, Listbox, Button, EXTENDED, END, DISABLED, Misc, NORMAL
-from turtle import width
 from typing import Tuple
 from src.modules.configuration.config import Config
 from src.modules.gui.accountInputWindow import AccountInputWindow
@@ -19,7 +18,6 @@ class ConfigWindow(Toplevel):
         super().__init__(master=master, padx=2, pady=5)
         self.title("Configuration")
         self.geometry(f'200x250+{xPos}+{yPos}')
-        # self.iconbitmap(default="./banana-voter.ico")
         self.config = config
         self.needSave = False
         self.debugModeVar = tkinter.BooleanVar(master=self, value=self.config.debugMode)
