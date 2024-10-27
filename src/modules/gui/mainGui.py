@@ -36,24 +36,24 @@ class AutovoteGui(Tk):
 
         firstFrame = Frame(self)
         firstFrame.grid(row=0, sticky="nsew")
-        self.configureButton = Button(firstFrame, text='Configure', 
+        self.configureButton = Button(firstFrame, text='Configure',
                                       command=self.configureButtonAction)
         self.configureButton.grid(row=0, column=1)
 
         self.progressVal = tkinter.DoubleVar()
-        progressBar = Progressbar(firstFrame, 
-                                  orient="horizontal", 
-                                  variable= self.progressVal, 
-                                  length=300, mode="determinate", 
+        progressBar = Progressbar(firstFrame,
+                                  orient="horizontal",
+                                  variable= self.progressVal,
+                                  length=300, mode="determinate",
                                   maximum=100)
         progressBar.grid(row=0)
 
-        self.textArea = scrolledtext.ScrolledText(self,  
-                                        wrap = WORD,  
+        self.textArea = scrolledtext.ScrolledText(self,
+                                        wrap = WORD,
                                         height = 10,
                                         width = 10,
-                                        font = ("Times New Roman", 
-                                                15)) 
+                                        font = ("Times New Roman",
+                                                15))
         self.textArea.grid(row=2, sticky="ew")
         self.textArea.configure(state ='disabled')
 
@@ -78,7 +78,7 @@ class AutovoteGui(Tk):
     def votingMessageCallback(self, message: VotingProcessMessage):
         value = float(message.numProcessed) / float(message.totalAccount) * 100
         self.progressVal.set(value)
-        if(message.totalAccount == message.numProcessed):
+        if message.totalAccount == message.numProcessed:
             self.startButton.config(state=NORMAL)
             self.startButton.config(text='Start Voting!')
             self.progressVal.set(100)

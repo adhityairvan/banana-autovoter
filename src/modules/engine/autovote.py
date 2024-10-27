@@ -40,27 +40,31 @@ class AutoVoteApp:
         usernameInput.send_keys(Keys.RETURN)
 
         try :
-            WebDriverWait(self.driver, self.appConfig.timeoutLimit).until(EC.visibility_of_element_located((By.LINK_TEXT, 'Logout')))
+            WebDriverWait(self.driver,
+                          self.appConfig.timeoutLimit).until(
+                              EC.visibility_of_element_located((By.LINK_TEXT, 'Logout')))
         except TimeoutException as exc:
             raise ValueError from exc
 
     def logout(self):
         logoutButton = self.driver.find_element(By.LINK_TEXT, 'Logout')
         logoutButton.click()
-        WebDriverWait(self.driver, self.appConfig.timeoutLimit).until(EC.visibility_of_element_located((By.LINK_TEXT, 'Login')))
+        WebDriverWait(self.driver, 
+                      self.appConfig.timeoutLimit).until(
+                          EC.visibility_of_element_located((By.LINK_TEXT, 'Login')))
 
     def tryVoteAllOption(self):
         windowHandle = self.driver.current_window_handle
         self.driver.get(RFBANANA_CPANEL + '/index.php?do=user_vote')
         voteButtons = self.driver.find_elements(By.NAME, 'vote_id')
         for button in voteButtons:
-            if(not button.is_enabled()):
+            if not button.is_enabled():
                 continue
             button.click()
             self.print("Voted. Cash point added")
             self.driver.switch_to.window(windowHandle)
     def start(self):
-        if(len(self.appConfig.accounts) == 0):
+        if len(self.appConfig.accounts) == 0:
             self.print('No account inputted. Please input account first')
             self.queue.put(VotingProcessMessage("voting", 1, 1, list()))
             return
@@ -79,9 +83,11 @@ class AutoVoteApp:
                 self.print('Error Auto voting for username: ' + account.username)
                 self.print('Error happen when searching for things to click. Probably from slow connection to website. Please re run if needed')
             numProcessed += 1
-            self.queue.put(VotingProcessMessage("voting", self.appConfig.accounts.__len__(), numProcessed, list()))
+            self.queue.put(
+                VotingProcessMessage("voting", len(self.appConfig.accounts), numProcessed, list()))
         self.print('Finish voting for all account inputted. Enjoy -NightKnight')
         if self.appConfig.debugMode:
             os.system("pause")
     def print(self, input: str):
         self.queue.put(TextMessage("voting", input))
+        

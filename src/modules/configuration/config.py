@@ -14,13 +14,14 @@ class Config:
     def __init__(self) -> None:
         with open(CONFIG_FILE, encoding="UTF", mode="a+") as configRaw:
             configRaw.seek(0)
-            if(configRaw.read() == ""):
+            if configRaw.read() == "":
                 stringDumps = jsons.dumps(obj=self, key_transformer=jsons.KEY_TRANSFORMER_SNAKECASE)
                 configRaw.write(stringDumps)
             configRaw.seek(0)
             config = json.load(configRaw)
             for jsonAccount in config.get('accounts'):
-                self.accounts.append(Account(jsonAccount.get('username'), jsonAccount.get('password')))
+                self.accounts.append(Account(jsonAccount.get('username'), 
+                                             jsonAccount.get('password')))
             self.cpanelUrl = config.get('cpanel_host', RFBANANA_CPANEL)
             self.timeoutLimit = config.get('timeout_limit')
             self.debugMode = config.get('debug_mode', False)
