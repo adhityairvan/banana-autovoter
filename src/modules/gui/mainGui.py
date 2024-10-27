@@ -7,6 +7,7 @@ from tkinter import INSERT, END, WORD, NORMAL
 import tkinter
 from tkinter.ttk import Progressbar
 
+from src.modules.dataclass.textMessage import TextMessage
 from src.modules.gui.configWindow import ConfigWindow
 from src.modules.dataclass.votingProcessMessage import VotingProcessMessage
 from src.modules.engine.autovote import AutoVoteApp
@@ -21,14 +22,12 @@ class AutovoteGui(Tk):
     def __init__(self) -> None:
         super().__init__("Autovoter v1.1.0", None, "Autovote", useTk=True, sync= False)
         self.title('RF Banana Autovoter v1.1.0')
-        self.iconbitmap("../resources/banana-voter.ico")
+        self.iconbitmap("./banana-voter.ico")
         self.geometry("385x270")
         self.resizable(False, False)
         self.configure(padx=10, pady=5)
         self.drawGui()
 
-        # sys.stdout.write = self.outputRedirector
-        # sys.stderr.write = self.outputRedirector
 
         self.text_area: scrolledtext.ScrolledText
         self.processingQueue: queue.Queue = queue.Queue()
@@ -69,6 +68,8 @@ class AutovoteGui(Tk):
             if message is not None:
                 if isinstance(message, VotingProcessMessage):
                     self.votingMessageCallback(message)
+                elif isinstance(message, TextMessage):
+                    self.textMessageCallback(message)
             self.after(200, self.readQueue)
         except queue.Empty:
             self.after(200, self.readQueue)
@@ -82,6 +83,15 @@ class AutovoteGui(Tk):
             self.startButton.config(state=NORMAL)
             self.startButton.config(text='Start Voting!')
             self.progressVal.set(100)
+        pass
+
+    def textMessageCallback(self, message: TextMessage):
+        value = message.textMessage
+        self.text_area.configure(state=NORMAL)
+        self.text_area.insert(INSERT, value)
+        self.text_area.insert(END,'\n')
+        self.text_area.see(END)
+        self.text_area.configure(state=DISABLED)
         pass
 
     def startButtonAction(self):

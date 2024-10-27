@@ -9,6 +9,7 @@ from selenium.webdriver.remote.webdriver import WebDriver
 
 from queue import Queue
 from src.modules.dataclass.account import Account
+from src.modules.dataclass.textMessage import TextMessage
 from src.modules.dataclass.votingProcessMessage import VotingProcessMessage
 import os
 from src.modules.configuration.config import RFBANANA_CPANEL
@@ -56,16 +57,13 @@ class AutoVoteApp:
             if(not button.is_enabled()):
                 continue
             button.click()
-            print("Voted. Cash point added")
+            self.print("Voted. Cash point added")
             self.driver.switch_to.window(windowHandle)
     def start(self):
         if(self.appConfig.accounts.__len__() == 0):
-            print('No account inputted. Please input account first')
+            self.print('No account inputted. Please input account first')
             self.queue.put(VotingProcessMessage("voting", 1, 1, list()))
             return
-        for account in self.appConfig.accounts:
-            print(account.__str__(), end=" | ")
-        print()
         numProcessed: int = 0
         for account in self.appConfig.accounts:
             try:
@@ -74,14 +72,16 @@ class AutoVoteApp:
                 self.login(account)
                 self.tryVoteAllOption()
                 self.logout()
-                print('RF Banana voting for account: ' + account.username + ' is complete')
+                self.print('RF Banana voting for account: ' + account.username + ' is complete')
             except ValueError:
-                print('Failed to login' + account.username + ' or account not exists')
+                self.print('Failed to login' + account.username + ' or account not exists')
             except (NoSuchElementException , TimeoutException) as ex:
-                print('Error Auto voting for username: ' + account.username)
-                print('Error happen when searching for things to click. Probably from slow connection to website. Please re run if needed')
+                self.print('Error Auto voting for username: ' + account.username)
+                self.print('Error happen when searching for things to click. Probably from slow connection to website. Please re run if needed')
             numProcessed += 1
             self.queue.put(VotingProcessMessage("voting", self.appConfig.accounts.__len__(), numProcessed, list()))
-        print('Finish voting for all account inputted. Enjoy -NightKnight')
+        self.print('Finish voting for all account inputted. Enjoy -NightKnight')
         if self.appConfig.debugMode:
             os.system("pause")
+    def print(self, input: str):
+        self.queue.put(TextMessage("voting", input))
