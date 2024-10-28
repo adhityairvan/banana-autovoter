@@ -18,7 +18,7 @@ class AutovoteGui(Tk):
     textArea: scrolledtext.ScrolledText
     configWindow: ConfigWindow
     def __init__(self) -> None:
-        super().__init__("Autovoter v1.1.0", None, "Autovote", useTk=True, sync= False)
+        super().__init__("Autovoter v2.0.1", None, "Autovote", useTk=True, sync= False)
         self.title('RF Banana Autovoter v1.1.0')
         self.iconbitmap(default="./_internal/banana-voter.ico")
         self.geometry("385x270")
