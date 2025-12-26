@@ -62,8 +62,9 @@ class ConfigWindow(Toplevel):
 
     def deleteButtonAction(self):
         for selectedAccount in self.userListBox.curselection()[::-1]:
-            self.config.deleteAccount(selectedAccount)
+            self.config.deleteAccount(self.config.accounts[selectedAccount].username)
             self.userListBox.delete(selectedAccount)
+            self.needSave = True
         self.userListBox.selection_clear(0)
     def saveButtonAction(self):
         self.config.saveChangesToJson()
