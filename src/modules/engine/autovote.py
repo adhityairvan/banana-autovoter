@@ -24,6 +24,7 @@ class AutoVoteApp:
         chromeOptions = webdriver.ChromeOptions()
         if self.appConfig.debugMode is False:
             chromeOptions.add_argument('--headless')
+            chromeOptions.add_argument('--window-size=1920,1080')
         chromeOptions.add_argument('--log-level=3')
         self.driver = webdriver.Chrome(options= chromeOptions)
         self.queue = queue
@@ -38,6 +39,7 @@ class AutoVoteApp:
         passwordInput.send_keys(account.password)
 
         usernameInput.send_keys(Keys.RETURN)
+        ss = self.driver.get_screenshot_as_base64()
 
         try :
             WebDriverWait(self.driver,
@@ -78,7 +80,7 @@ class AutoVoteApp:
                 self.logout()
                 self.print('RF Banana voting for account: ' + account.username + ' is complete')
             except ValueError:
-                self.print('Failed to login' + account.username + ' or account not exists')
+                self.print('Failed to login ' + account.username + ' or account not exists')
             except (NoSuchElementException , TimeoutException):
                 self.print('Error Auto voting for username: ' + account.username)
                 self.print('Error happen when searching for things to click. Probably from slow connection to website. Please re run if needed')
